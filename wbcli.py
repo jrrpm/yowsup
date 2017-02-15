@@ -8,7 +8,7 @@ logging.basicConfig(level=logging.INFO)
 
 #todo db credential
 def credential():
-    return "59178503175","t3F+47AOq88gef34KvqHCSVpdQY="
+    return "",""
 
 stack = YowsupBotStack(credential())
 stack.start()
