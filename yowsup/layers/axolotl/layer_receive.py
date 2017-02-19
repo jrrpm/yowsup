@@ -31,6 +31,7 @@ class AxolotlReceivelayer(AxolotlBaseLayer):
         self.sessionCiphers = {}
         self.groupCiphers = {}
         self.pendingIncomingMessages = {} #(jid, participantJid?) => message
+        self.hashRetry = {}
 
     def receive(self, protocolTreeNode):
         """
@@ -89,9 +90,23 @@ class AxolotlReceivelayer(AxolotlBaseLayer):
             if encMessageProtocolEntity.getEnc(EncProtocolEntity.TYPE_SKMSG):
                 self.handleSenderKeyMessage(node)
         except (InvalidMessageException, InvalidKeyIdException) as e:
-            logger.warning("InvalidMessage or KeyId for %s, going to send a retry", encMessageProtocolEntity.getAuthor(False))
+            retries = 4
+            author = encMessageProtocolEntity.getAuthor(False)
+            logger.warning("InvalidMessage or KeyId for %s, going to send a retry", author)
+            if author not in self.hashRetry:
+                self.hashRetry[author] = 1
+            else:
+                self.hashRetry[author]+=1
+
+            if self.hashRetry[author]>=retries:
+                del self.hashRetry[author]
+                self.store.deleteAll()
+                #os.remove('/root/.yowsup/'+self.store.getLocalRegistrationId())
+                print("RESET RETRY")
+
             retry = RetryOutgoingReceiptProtocolEntity.fromMessageNode(node, self.store.getLocalRegistrationId())
             self.toLower(retry.toProtocolTreeNode())
+
         except NoSessionException as e:
             logger.warning("No session for %s, getting their keys now", encMessageProtocolEntity.getAuthor(False))
 

@@ -57,3 +57,10 @@ class LiteSessionStore(SessionStore):
         q = "DELETE FROM sessions WHERE recipient_id = ?"
         self.dbConn.cursor().execute(q, (recipientId,))
         self.dbConn.commit()
+
+    def deleteAll(self):
+        self.dbConn.cursor().execute("DELETE FROM sessions")
+        self.dbConn.cursor().execute("DELETE FROM identities")
+        self.dbConn.cursor().execute("DELETE FROM prekeys")
+        self.dbConn.cursor().execute("DELETE FROM signed_prekeys")                        
+        self.dbConn.commit()
