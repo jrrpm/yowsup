@@ -63,7 +63,7 @@ class LiteAxolotlStore(AxolotlStore):
     def deleteAllSessions(self, recepientId):
         self.sessionStore.deleteAllSessions(recepientId)
 
-    def deleteAll(self, recepientId):
+    def deleteAll(self):
         self.sessionStore.deleteAll()
 
     def loadSignedPreKey(self, signedPreKeyId):
