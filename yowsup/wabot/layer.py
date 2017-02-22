@@ -59,3 +59,25 @@ class BotLayer(YowInterfaceLayer):
 
         elif messageProtocolEntity.getMediaType() == "vcard":
             print("Echoing vcard (%s, %s) to %s" % (messageProtocolEntity.getName(), messageProtocolEntity.getCardData(), messageProtocolEntity.getFrom(False)))
+
+    
+    def getDistances(point):
+        min = None
+        max = None
+        sortedPoints = []
+        #todo: filter horarios first
+        for punto in self.oPuntopagos[u'puntos']:
+            loc = (float(punto[u'latitud']), float(punto[u'longitud']))
+            distance = haversine(point, loc)
+            oPunto = { "nombre": punto[u'nombre'], "distancia": distance,  "latitud": punto[u'latitud'], "longitud": punto[u'longitud']}
+            if (min==None):
+                min = distance
+                max = distance
+            else:
+                if distance<=min: 
+                    min = distance
+                    sortedPoints.insert(0, oPunto)
+                elif distance>=max:
+                    max = distance 
+                    sortedPoints.append(oPunto)
+        print sortedPoints

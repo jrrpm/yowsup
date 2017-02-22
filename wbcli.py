@@ -9,13 +9,23 @@ logging.basicConfig(level=logging.INFO)
 
 global oPuntopagos
 
-client = MongoClient("mongodb://localhost:27017") #todo db auth+config file
-db = client.wabots
-oPuntopagos = db.puntosPago.find_one()
+def loadData():
+    client = MongoClient("mongodb://localhost:27017") #todo db auth+config file
+    db = client.wabots
+    oPuntopagos = db.puntosPago.find_one()
+
 
 #todo db credential
 def credential():
     return oPuntopagos[u'phone'],oPuntopagos[u'password']
 
-stack = YowsupBotStack(credential())
+
+loadData()
+
+for punto in oPuntopagos[u'puntos']:
+    print punto[u'nombre']
+    print "\n"
+
+
+stack = YowsupBotStack(credential(), oPuntopagos)
 stack.start()
