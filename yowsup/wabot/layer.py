@@ -38,46 +38,43 @@ class BotLayer(YowInterfaceLayer):
             print("Echoing image %s to %s" % (messageProtocolEntity.url, messageProtocolEntity.getFrom(False)))
 
         elif messageProtocolEntity.getMediaType() == "location":
-            ofi = (float(-17.780843), float(-63.185648))
             ori = (float(messageProtocolEntity.getLatitude()), float(messageProtocolEntity.getLongitude()))
             to = messageProtocolEntity.getFrom()
             distance = haversine(ori, ofi)
-            msg = 'Noticell informa a {}, que se encuentra a "{}" Km de la oficina del morrito pinto'.format(messageProtocolEntity.getFrom(False), distance)
+            nearPoints = self.getDistances(ori)
+            msg = 'Punto de pago mas cercano: {}, se encuentra a {} Km de distancia.'.format(nearPoints[0]['nombre'], nearPoints[0]['distancia'])
             respMsg = TextMessageProtocolEntity(msg, to = to)
             respMsg._from = None
             respMsg._id = respMsg._generateId()
-            #dir(respMsg)
-            self.toLower(respMsg)      
+            self.toLower(respMsg)
             respMsg = deepcopy(messageProtocolEntity)
             respMsg.to = to
             respMsg._from = None
-            respMsg.latitude = "-17.780843"
-            respMsg.longitude = "-63.185648"
+            respMsg.latitude = nearPoints[0]['latitud']
+            respMsg.longitude = nearPoints[0]['longitud']
+            respMsg.name = nearPoints[0]['nombre']
             respMsg._id = respMsg._generateId()
             self.toLower(respMsg)
-            print("Echoing location (%s, %s) to %s" % (messageProtocolEntity.getLatitude(), messageProtocolEntity.getLongitude(), messageProtocolEntity.getFrom(False)))
-
+            length = len(nearPoints)
+            if nearPoints>1:
+                msg = 'Otros puntos cercanos: \n  {} a {} Km'.format(nearPoints[1]['nombre'], nearPoints[1]['distancia'])
+                if nearPoints>2:
+                    msg += '\n  {} a {} Km'.format(nearPoints[2]['nombre'], nearPoints[2]['distancia'])
+                respMsg = TextMessageProtocolEntity(msg, to = to)
+                respMsg._from = None
+                respMsg._id = respMsg._generateId()
+                self.toLower(respMsg)
         elif messageProtocolEntity.getMediaType() == "vcard":
             print("Echoing vcard (%s, %s) to %s" % (messageProtocolEntity.getName(), messageProtocolEntity.getCardData(), messageProtocolEntity.getFrom(False)))
 
     
     def getDistances(self, point):
-        min = None
-        max = None
         sortedPoints = []
         #todo: filter horarios first
-        for punto in self.oPuntoPagos[u'puntos']:
+        for punto in self.oPuntosPago[u'puntos']:
             loc = (float(punto[u'latitud']), float(punto[u'longitud']))
-            distance = haversine(point, loc)
-            oPunto = { "nombre": punto[u'nombre'], "distancia": distance,  "latitud": punto[u'latitud'], "longitud": punto[u'longitud']}
-            if (min==None):
-                min = distance
-                max = distance
-            else:
-                if distance<=min: 
-                    min = distance
-                    sortedPoints.insert(0, oPunto)
-                elif distance>=max:
-                    max = distance 
-                    sortedPoints.append(oPunto)
-        print sortedPoints
+            distance = round(haversine(point, loc), 1)
+            oPunto = { "nombre": punto[u'nombre'], "distancia": distance,  "latitud": punto[u'latitud'], "longitud": punto[u'longitud'] }
+            sortedPoints.append(oPunto)
+        sortedPoints.sort(key=lambda x: x["distancia"])
+        return sortedPoints
