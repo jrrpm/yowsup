@@ -40,7 +40,6 @@ class BotLayer(YowInterfaceLayer):
         elif messageProtocolEntity.getMediaType() == "location":
             ori = (float(messageProtocolEntity.getLatitude()), float(messageProtocolEntity.getLongitude()))
             to = messageProtocolEntity.getFrom()
-            distance = haversine(ori, ofi)
             nearPoints = self.getDistances(ori)
             msg = 'Punto de pago mas cercano: {}, se encuentra a {} Km de distancia.'.format(nearPoints[0]['nombre'], nearPoints[0]['distancia'])
             respMsg = TextMessageProtocolEntity(msg, to = to)

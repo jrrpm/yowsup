@@ -20,13 +20,7 @@ def loadData():
 def credential():
     return oPuntosPago[u'phone'],oPuntosPago[u'password']
 
-
 loadData()
-
-for punto in oPuntosPago[u'puntos']:
-    print punto[u'nombre']
-    print "\n"
-
 
 stack = YowsupBotStack(credential(), oPuntosPago)
 stack.start()
