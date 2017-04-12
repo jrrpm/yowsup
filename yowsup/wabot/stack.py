@@ -13,7 +13,7 @@ class YowsupBotStack(object):
             .push(BotLayer)\
             .build()
         self.stack.setCredentials(credentials)
-        sLayer = stack.getLayer(8)
+        sLayer = self.stack.getLayer(8)
         sLayer.hPath = {} 
         sLayer.config = config
 

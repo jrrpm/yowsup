@@ -14,15 +14,15 @@ class BotLayer(YowInterfaceLayer):
 
     @ProtocolEntityCallback("message")
     def onMessage(self, messageProtocolEntity):
-        mediaType = messageProtocolEntity.getMediaType()
-        msg = 'Mensaje recibido de: {}, tipo: {}.'.format(messageProtocolEntity.getFrom(), mediaType)
-        logging.info(msg)
-        time.sleep(config.responseDelay)
+        msgType = messageProtocolEntity.getType()
+        msg = 'Mensaje recibido de: {}, tipo: {}.'.format(messageProtocolEntity.getFrom(), msgType)
+        logging.info(msg)            
+        time.sleep(self.config.responseDelay)   
         self.toLower(messageProtocolEntity.ack())
         self.toLower(messageProtocolEntity.ack(True))
-        if mediaType == 'text':
+        if msgType == 'text':
             self.onTextMessage(messageProtocolEntity)
-        elif mediaType == 'media':
+        elif msgType == 'media':
             self.onMediaMessage(messageProtocolEntity)      
 
     @ProtocolEntityCallback("receipt")
@@ -124,7 +124,8 @@ class BotLayer(YowInterfaceLayer):
 
 
     def requestImageUpload(self, imagePath):
-        self.demoContactJid = "59178503175@s.whatsapp.net" #only for the sake of simplicity of example, shoudn't do this
+        cjid = '{}@s.whatsapp.net'.format(self.config.oPuntosPago[u'phone'])
+        self.demoContactJid = cjid 
         requestUploadEntity = RequestUploadIqProtocolEntity("image", filePath = imagePath)
         self.hPath[requestUploadEntity.getId()] = imagePath
         self._sendIq(requestUploadEntity, self.onRequestUploadResult, self.onRequestUploadError)
@@ -149,8 +150,6 @@ class BotLayer(YowInterfaceLayer):
 
     def onUploadProgress(self, filePath, jid, url, progress):
         print('Path: {}, url: {}, progress: {}.'.format(filePath, url, progress))
-        #sys.stdout.write("%s => %s, %d%% \r" % (os.path.basename(filePath), jid, progress))
-        #sys.stdout.flush()    
 
     def onUploadSuccess(self, filePath, jid, url):
         #convenience method to detect file/image attributes for sending, requires existence of 'pillow' library

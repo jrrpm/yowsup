@@ -27,10 +27,12 @@ def load():
                                        when="d",
                                        interval=1,
                                        backupCount=5)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)                                       
     logger.addHandler(handler)
     client = MongoClient(config.dbString) 
     db = getattr(client, config.dbName)
-    config.oPuntosPago = getattr(db, collectionName).find_one()
+    config.oPuntosPago = getattr(db, config.collectionName).find_one()
 
 def credential():
     return config.oPuntosPago[u'phone'],config.oPuntosPago[u'password']
