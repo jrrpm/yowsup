@@ -6,15 +6,16 @@ from yowsup.layers.network import YowNetworkLayer
 
 class YowsupBotStack(object):  
 
-    def __init__(self, credentials, oPuntosPago, encryptionEnabled = True):
+    def __init__(self, credentials, config, encryptionEnabled = True):
         stackBuilder = YowStackBuilder()
         self.stack = stackBuilder\
             .pushDefaultLayers(encryptionEnabled)\
             .push(BotLayer)\
             .build()
         self.stack.setCredentials(credentials)
-        self.stack.getLayer(8).oPuntosPago = oPuntosPago
-        
+        sLayer = stack.getLayer(8)
+        sLayer.hPath = {} 
+        sLayer.config = config
 
     def start(self):
         self.stack.broadcastEvent(YowLayerEvent(YowNetworkLayer.EVENT_STATE_CONNECT))
